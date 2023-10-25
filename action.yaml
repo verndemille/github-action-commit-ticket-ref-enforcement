@@ -133,7 +133,7 @@ jobs:
       run: |
         echo "Showing configuration setup (To disable set show-logging false.)"
         echo ""
-        echo "Enforce Stable Commit Message: ${{inputs.enforce-stable-commit-message}}"
+        echo "Enforce Stable Commit Message: [[ ${{ inputs.enforce-stable-commit-message }} ]]"
         echo "Feature Commit Regex: ${{inputs.feature-commit-regex}}"
         echo ""
         echo "Enforce Feature Commit Message: ${{inputs.enforce-feature-commit-message}}"
