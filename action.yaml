@@ -10,7 +10,7 @@ inputs:
     description: "Branch names considered stable for your repository."
     required: false
     type: string
-    default: "main,master,dev,develop,development,qa,staging,stage"
+    default: '["main","master","dev","develop","development","qa","staging","stage"]'
 
   enforce-stable-commit-message:
     description: If the stable commit message should be enforced.
@@ -154,7 +154,7 @@ runs:
         echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
         echo ""
     - name: Feature Branch Name Check
-      if: IFS=', ' read -r -a inputs.stable-branches-csv <<< github.ref.name && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
+      if: !contains(fromJSON(inputs.stable-branches-csv),github.ref.name) && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
       shell: bash
       run: |          
         if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
