@@ -9,7 +9,8 @@ jobs:
     name: Test Me
     runs-on: ubuntu-latest
     steps:
-      - name: Configure Coding Standards
+      - name: Self test
         uses: ./
+        id: self-test
         with:
           show-logging: true
