@@ -134,36 +134,3 @@ jobs:
         echo "Showing configuration setup (To disable set show-logging false.)"
         echo ""
         
-    - name: Feature Branch Name Check
-      if: IFS=', ' read -r -a inputs.stable-branches-csv <<< github.ref.name && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
-      run: |          
-        if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
-        then
-          MESSAGE="Your branch name must start with a ticket number EG OP-123 or OP-123-ShinyFeature"
-          echo "$MESSAGE"
-          echo "::error::$MESSAGE"
-          exit 1
-        fi
-          exit 0
-    - name: Feature Commit Message Check
-      if: github.ref.name != 'master' && github.ref.name != 'develop' && github.ref.name != 'staging' && github.ref.name != 'qa'  && !startsWith(github.ref.name, 'release/*')
-      run: |          
-        if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
-        then              
-            MESSAGE="Your feature commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
-            echo "$MESSAGE"
-            echo "::error::$MESSAGE"
-            exit 1
-        fi
-          exit 0
-    - name: Stable Commit Message Check
-      if: github.ref.name == 'master' || github.ref.name == 'develop' || github.ref.name == 'staging' || github.ref.name == 'qa'
-      run: |          
-        if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
-        then              
-            MESSAGE="Your stable commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
-            echo "$MESSAGE"
-            echo "::error::$MESSAGE"
-            exit 1
-        fi
-          exit 0
