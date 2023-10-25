@@ -10,6 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure Coding Standards
-        uses: ./.action.yml
+        uses: ./.
         with:
           show-logging: true
