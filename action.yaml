@@ -153,18 +153,18 @@ runs:
         echo "Enforce Hotfix Branch Name Message: ${{inputs.enforce-hotfix-branch-name}}"
         echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
         echo ""
-    # - name: Feature Branch Name Check
-    #   if: IFS=', ' read -r -a inputs.stable-branches-csv <<< github.ref.name && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
-    #   shell: bash
-    #   run: |          
-    #     if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
-    #     then
-    #       MESSAGE="Your branch name must start with a ticket number EG OP-123 or OP-123-ShinyFeature"
-    #       echo "$MESSAGE"
-    #       echo "::error::$MESSAGE"
-    #       exit 1
-    #     fi
-    #       exit 0
+    - name: Feature Branch Name Check
+      if: IFS=', ' read -r -a inputs.stable-branches-csv <<< github.ref.name && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
+      shell: bash
+      run: |          
+        if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
+        then
+          MESSAGE="Your branch name must start with a ticket number EG OP-123 or OP-123-ShinyFeature"
+          echo "$MESSAGE"
+          echo "::error::$MESSAGE"
+          exit 1
+        fi
+          exit 0
     # - name: Feature Commit Message Check
     #   if: github.ref.name != 'master' && github.ref.name != 'develop' && github.ref.name != 'staging' && github.ref.name != 'qa'  && !startsWith(github.ref.name, 'release/*')
     #   shell: bash
