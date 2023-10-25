@@ -1,0 +1,191 @@
+name: Commit Ticket Reference Enforcement
+description: "This is a reusable github action with the intention of forcing valid ticket references as prefixes for commit messages and branch names. Expected to be used with gitflow or lane stable gitflow by default."
+inputs:
+on:
+  workflow_call:
+    inputs: 
+      show-logging:
+        description: "If the configs should be looged out."
+        required: false
+        type: boolean
+        default: "true"
+      stable-branches-csv:
+        description: "Branch names considered stable for your repository."
+        required: false
+        type: string
+        default: "main,master,dev,develop,development,qa,staging,stage"
+
+      enforce-stable-commit-message:
+        description: If the stable commit message should be enforced.
+        required: false
+        type: boolean
+        default: true
+      stable-commit-regex:
+        description: "Required message prefix on stable branch."
+        required: false
+        type: string
+        default:  "^[Merge pull request]"
+      stable-commit-regex-failure-message:
+        description: "Message for when required message prefix on a stable branch commit message fails. Should explain how to pass."
+        required: false
+        type: string
+        default:  "Your commit message to a stable branch requires the prefix. [Merge pull request...]. You should be doing a PR."
+
+      enforce-feature-commit-message:
+        description: If the stable commit message should be enforced.
+        required: false
+        type: boolean
+        default: true
+      feature-commit-regex:
+        description: "Required message prefix on feature branch."
+        required: false
+        type: string
+        default: "^[#][0-9]+"
+      feature-commit-regex-failure-message:
+        description: "Message for when required message prefix on a feature branch commit message fails. Should explain how to pass."
+        required: false
+        type: string
+        default: "Your feature commit message must start with a ticket number EG #123: Message or # Message"
+
+      enforce-feature-branch-name:
+        description: If the stable commit message should be enforced.
+        required: false
+        type: boolean
+        default: true
+      feature-branch-regex: 
+        description: "Required prefix on feature branch name."
+        required: false
+        type: string
+        default: "^feature-[#][0-9]+"
+      feature-branch-regex-failure-message: 
+        description: "Message for when required message prefix on a feature branch name fails. Should explain how to pass."
+        required: false
+        type: string
+        default: "Your branch name must start with an issue number EG #123 or #123-ShinyFeature"
+
+      enforce-release-commit-message:
+        description: If the stable commit message should be enforced.
+        required: false
+        type: boolean
+        default: true
+      release-commit-regex:
+        description: "Required message prefix on release branch."
+        required: false
+        type: string
+        default: "^[#][0-9]+"
+      release-commit-regex-failure-message:
+        description: "Message for when required message prefix on a release branch commit message fails. Should explain how to pass."
+        required: false
+        type: string
+        default: "Your release commit message must start with a ticket number EG #123: Message or # Message"
+
+      enforce-release-branch-name:
+        description: If the stable commit message should be enforced.
+        required: false
+        type: boolean
+        default: true
+      release-branch-name-regex: 
+        description: "Required prefix on release branch name."
+        required: false
+        type: string
+        default: "^release-[#][0-9]+"
+      release-branch-name-regex-failure-message: 
+        description: "Message for when required message prefix on a release branch name fails. Should explain how to pass."
+        required: false
+        type: string
+        default: "Your branch name must start with an issue number EG #123 or #123-ShinyFeature"
+
+      enforce-hotfix-commit-message:
+        description: If the stable commit message should be enforced.
+        required: false
+        type: boolean
+        default: true
+      hotfix-commit-regex:
+        description: "Required message prefix on hotfix branch."
+        required: false
+        type: string
+        default: "^[#][0-9]+"
+      hotfix-commit-regex-failure-message:
+        description: "Message for when required message prefix on a hotfix branch commit message fails. Should explain how to pass."
+        required: false
+        type: string
+        default: "Your feature commit message must start with a ticket number EG #123: Message or # Message"
+
+      enforce-hotfix-branch-name:
+        description: If the stable commit message should be enforced.
+        required: false
+        type: boolean
+        default: true
+      hotfix-branch-name-regex: 
+        description: "Required prefix on hotfix branch name."
+        required: false
+        type: string
+        default: "^hotifx-[#][0-9]+"
+      hotifix-branch-name-regex-failure-message: 
+        description: "Message for when required message prefix on a hotfix branch name fails. Should explain how to pass."
+        required: false
+        type: string
+        default: "Your branch name must start with an issue number EG #123 or #123-ShinyFeature"
+jobs:
+  commit-ticket-ref-enforcement:    
+    runs-on: ubuntu-latest
+    steps:      
+      - name: Logging
+        if: [[${{inputs.show-logging}}]]
+        run: |
+          echo "Showing configuration setup (To disable set show-logging false.)"
+          echo ""
+          echo "Enforce Stable Commit Message: ${{inputs.enforce-stable-commit-message}}"
+          echo "Feature Commit Regex: ${{inputs.feature-commit-regex}}"
+          echo ""
+          echo "Enforce Feature Commit Message: ${{inputs.enforce-feature-commit-message}}"
+          echo "Feature Commit Regex: ${{inputs.feature-commit-regex}}"
+          echo ""
+          echo "Enforce Feature Branch Name Message: ${{inputs.enforce-feature-branch-name}}"
+          echo "Feature Branch Name Regex: ${{inputs.feature-branch-name-regex}}"
+          echo ""
+          echo "Enforce Release Commit Message: ${{inputs.enforce-release-commit-message}}"
+          echo "Release Commit Regex: ${{inputs.release-commit-regex}}"
+          echo ""
+          echo "Enforce Release Branch Name Message: ${{inputs.enforce-release-branch-name}}"
+          echo "Release Branch Name Regex: ${{inputs.release-branch-name-regex}}"
+          echo ""
+          echo "Enforce Hotfix Commit Message: ${{inputs.enforce-hotfix-commit-message}}"
+          echo "Hotfix Commit Regex: ${{inputs.hotfix-commit-regex}}"
+          echo ""
+          echo "Enforce Hotfix Branch Name Message: ${{inputs.enforce-hotfix-branch-name}}"
+          echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
+          echo ""
+      - name: Feature Branch Name Check
+        if: ${{ IFS=', ' read -r -a inputs.stable-branches-csv <<< ${{github.ref.name}} }} && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
+        run: |          
+          if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
+          then
+            MESSAGE="Your branch name must start with a ticket number EG OP-123 or OP-123-ShinyFeature"
+            echo "$MESSAGE"
+            echo "::error::$MESSAGE"
+            exit 1
+          fi
+           exit 0
+      - name: Feature Commit Message Check
+        if: github.ref.name != 'master' && github.ref.name != 'develop' && github.ref.name != 'staging' && github.ref.name != 'qa'  && !startsWith(github.ref.name, 'release/*')
+        run: |          
+          if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
+          then              
+              MESSAGE="Your feature commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
+              echo "$MESSAGE"
+              echo "::error::$MESSAGE"
+              exit 1
+          fi
+           exit 0
+      - name: Stable Commit Message Check
+        if: github.ref.name == 'master' || github.ref.name == 'develop' || github.ref.name == 'staging' || github.ref.name == 'qa'
+        run: |          
+          if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
+          then              
+              MESSAGE="Your stable commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
+              echo "$MESSAGE"
+              echo "::error::$MESSAGE"
+              exit 1
+          fi
+           exit 0
