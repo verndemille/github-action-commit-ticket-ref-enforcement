@@ -128,6 +128,61 @@ runs:
   steps:      
     - name: Logging
       if: inputs.show-logging
+      shell: bash
       run: |
         echo "Showing configuration setup (To disable set show-logging false.)"
         echo ""
+        echo "Enforce Stable Commit Message: ${{ inputs.enforce-stable-commit-message }}"
+        echo "Feature Commit Regex: ${{inputs.feature-commit-regex}}"
+        echo ""
+        echo "Enforce Feature Commit Message: ${{inputs.enforce-feature-commit-message}}"
+        echo "Feature Commit Regex: ${{inputs.feature-commit-regex}}"
+        echo ""
+        echo "Enforce Feature Branch Name Message: ${{inputs.enforce-feature-branch-name}}"
+        echo "Feature Branch Name Regex: ${{inputs.feature-branch-name-regex}}"
+        echo ""
+        echo "Enforce Release Commit Message: ${{inputs.enforce-release-commit-message}}"
+        echo "Release Commit Regex: ${{inputs.release-commit-regex}}"
+        echo ""
+        echo "Enforce Release Branch Name Message: ${{inputs.enforce-release-branch-name}}"
+        echo "Release Branch Name Regex: ${{inputs.release-branch-name-regex}}"
+        echo ""
+        echo "Enforce Hotfix Commit Message: ${{inputs.enforce-hotfix-commit-message}}"
+        echo "Hotfix Commit Regex: ${{inputs.hotfix-commit-regex}}"
+        echo ""
+        echo "Enforce Hotfix Branch Name Message: ${{inputs.enforce-hotfix-branch-name}}"
+        echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
+        echo ""
+    - name: Feature Branch Name Check
+      if: IFS=', ' read -r -a inputs.stable-branches-csv <<< github.ref.name && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
+      run: |          
+        if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
+        then
+          MESSAGE="Your branch name must start with a ticket number EG OP-123 or OP-123-ShinyFeature"
+          echo "$MESSAGE"
+          echo "::error::$MESSAGE"
+          exit 1
+        fi
+          exit 0
+    - name: Feature Commit Message Check
+      if: github.ref.name != 'master' && github.ref.name != 'develop' && github.ref.name != 'staging' && github.ref.name != 'qa'  && !startsWith(github.ref.name, 'release/*')
+      run: |          
+        if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
+        then              
+            MESSAGE="Your feature commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
+            echo "$MESSAGE"
+            echo "::error::$MESSAGE"
+            exit 1
+        fi
+          exit 0
+    - name: Stable Commit Message Check
+      if: github.ref.name == 'master' || github.ref.name == 'develop' || github.ref.name == 'staging' || github.ref.name == 'qa'
+      run: |          
+        if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
+        then              
+            MESSAGE="Your stable commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
+            echo "$MESSAGE"
+            echo "::error::$MESSAGE"
+            exit 1
+        fi
+          exit 0
