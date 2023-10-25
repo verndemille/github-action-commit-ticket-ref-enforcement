@@ -154,7 +154,7 @@ runs:
         echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
         echo ""
     - name: Feature Branch Name Check
-      if: !contains(fromJSON(inputs.stable-branches-csv),github.ref.name) && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
+      if: startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
       shell: bash
       run: |          
         if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
