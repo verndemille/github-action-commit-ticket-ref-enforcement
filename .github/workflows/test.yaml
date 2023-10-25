@@ -9,6 +9,8 @@ jobs:
     name: Test Me
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
       - name: Self test
         uses: ./..
         id: self-test
