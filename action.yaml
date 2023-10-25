@@ -123,7 +123,7 @@ inputs:
     required: false
     type: string
     default: "Your branch name must start with an issue number EG #123 or #123-ShinyFeature"
-jobs:
+runs:
   using: 'composite'
   steps:      
     - name: Logging
