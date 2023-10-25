@@ -49,12 +49,12 @@ inputs:
     required: false
     type: boolean
     default: true
-  feature-branch-regex: 
+  feature-branch-name-regex: 
     description: "Required prefix on feature branch name."
     required: false
     type: string
     default: "^feature-[#][0-9]+"
-  feature-branch-regex-failure-message: 
+  feature-branch-name-regex-failure-message: 
     description: "Message for when required message prefix on a feature branch name fails. Should explain how to pass."
     required: false
     type: string
@@ -160,14 +160,14 @@ runs:
       if: startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
       shell: bash
       run: |          
-        if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
+        if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-name-regex}} ]]
         then
           echo "Yep Feature Branch Name Check"
         else
           echo "Nope Feature Branch Name Check"
         fi
     - name: Feature Commit Message Check
-      if: github.ref.name != 'master' && github.ref.name != 'develop' && github.ref.name != 'staging' && github.ref.name != 'qa'  && !startsWith(github.ref.name, 'release/*')
+      if: startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
@@ -177,7 +177,7 @@ runs:
           echo "Nope Feature Commit Message Check"
         fi
     - name: Stable Commit Message Check
-      if: github.ref.name == 'master' || github.ref.name == 'develop' || github.ref.name == 'staging' || github.ref.name == 'qa'
+      if: contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
