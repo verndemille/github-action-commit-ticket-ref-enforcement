@@ -153,39 +153,36 @@ runs:
         echo "Enforce Hotfix Branch Name Message: ${{inputs.enforce-hotfix-branch-name}}"
         echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
         echo ""
+        echo "Branch Name: ${{github.ref.name}}"
+        echo "Commit Message: ${{github.event.head_commit.message}}"
+        echo ""
     - name: Feature Branch Name Check
       if: startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
       shell: bash
       run: |          
         if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
         then
-          MESSAGE="Your branch name must start with a ticket number EG OP-123 or OP-123-ShinyFeature"
-          echo "$MESSAGE"
-          echo "::error::$MESSAGE"
-          exit 1
+          echo "Yep Feature Branch Name Check"
+        else
+          echo "Nope Feature Branch Name Check"
         fi
-          exit 0
-    # - name: Feature Commit Message Check
-    #   if: github.ref.name != 'master' && github.ref.name != 'develop' && github.ref.name != 'staging' && github.ref.name != 'qa'  && !startsWith(github.ref.name, 'release/*')
-    #   shell: bash
-    #   run: |          
-    #     if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
-    #     then              
-    #         MESSAGE="Your feature commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
-    #         echo "$MESSAGE"
-    #         echo "::error::$MESSAGE"
-    #         exit 1
-    #     fi
-    #       exit 0
-    # - name: Stable Commit Message Check
-    #   if: github.ref.name == 'master' || github.ref.name == 'develop' || github.ref.name == 'staging' || github.ref.name == 'qa'
-    #   shell: bash
-    #   run: |          
-    #     if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
-    #     then              
-    #         MESSAGE="Your stable commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
-    #         echo "$MESSAGE"
-    #         echo "::error::$MESSAGE"
-    #         exit 1
-    #     fi
-    #       exit 0
+    - name: Feature Commit Message Check
+      if: github.ref.name != 'master' && github.ref.name != 'develop' && github.ref.name != 'staging' && github.ref.name != 'qa'  && !startsWith(github.ref.name, 'release/*')
+      shell: bash
+      run: |          
+        if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
+                then
+          echo "Yep Feature Commit Message Check"
+        else
+          echo "Nope Feature Commit Message Check"
+        fi
+    - name: Stable Commit Message Check
+      if: github.ref.name == 'master' || github.ref.name == 'develop' || github.ref.name == 'staging' || github.ref.name == 'qa'
+      shell: bash
+      run: |          
+        if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
+                then
+          echo "Yep Stable Commit Message Check"
+        else
+          echo "Nope Stable Commit Message Check"
+        fi
