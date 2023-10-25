@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Self test
-        uses: ./
+        uses: ./..
         id: self-test
         with:
           show-logging: true
