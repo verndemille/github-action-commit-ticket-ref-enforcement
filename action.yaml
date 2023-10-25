@@ -129,7 +129,7 @@ jobs:
   using: 'composite'
   steps:      
     - name: Logging
-      if: ${{inputs.show-logging}}
+      if: ${{ inputs.show-logging }} == true
       run: |
         echo "Showing configuration setup (To disable set show-logging false.)"
         echo ""
