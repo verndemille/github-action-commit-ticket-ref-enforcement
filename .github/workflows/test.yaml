@@ -12,7 +12,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Self test
-        uses: ./..
+        uses: ./.
         id: self-test
         with:
           show-logging: true
