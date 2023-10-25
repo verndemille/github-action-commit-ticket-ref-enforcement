@@ -133,7 +133,7 @@ jobs:
       run: |
         echo "Showing configuration setup (To disable set show-logging false.)"
         echo ""
-        echo "Enforce Stable Commit Message: [[ ${{ inputs.enforce-stable-commit-message }} ]]"
+        echo "Enforce Stable Commit Message: ${{ inputs.enforce-stable-commit-message }}"
         echo "Feature Commit Regex: ${{inputs.feature-commit-regex}}"
         echo ""
         echo "Enforce Feature Commit Message: ${{inputs.enforce-feature-commit-message}}"
@@ -155,7 +155,7 @@ jobs:
         echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
         echo ""
     - name: Feature Branch Name Check
-      if: ${{ IFS=', ' read -r -a inputs.stable-branches-csv <<< ${{github.ref.name}} }} && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
+      if: IFS=', ' read -r -a inputs.stable-branches-csv <<< github.ref.name && !startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-')      
       run: |          
         if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-regex}} ]]
         then
