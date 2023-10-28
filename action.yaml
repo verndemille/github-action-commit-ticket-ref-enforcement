@@ -12,21 +12,21 @@ inputs:
     type: string
     default: '["main","master","dev","develop","development","qa","staging","stage"]'
 
-  enforce-stable-commit-message:
+  enforce-feature-branch-name:
     description: If the stable commit message should be enforced.
     required: false
     type: boolean
     default: true
-  stable-commit-regex:
-    description: "Required message prefix on stable branch."
+  feature-branch-name-regex: 
+    description: "Required prefix on feature branch name."
     required: false
     type: string
-    default:  "^[Merge pull request]"
-  stable-commit-regex-failure-message:
-    description: "Message for when required message prefix on a stable branch commit message fails. Should explain how to pass."
+    default: "^refs/heads/feature/[#][0-9]+"
+  feature-branch-name-regex-failure-message: 
+    description: "Message for when required message prefix on a feature branch name fails. Should explain how to pass."
     required: false
     type: string
-    default:  "Your commit message to a stable branch requires the prefix. [Merge pull request...]. You should be doing a PR."
+    default: "Your branch name must start with an issue number EG #123 or #123-ShinyFeature"
 
   enforce-feature-commit-message:
     description: If the stable commit message should be enforced.
@@ -42,23 +42,24 @@ inputs:
     description: "Message for when required message prefix on a feature branch commit message fails. Should explain how to pass."
     required: false
     type: string
-    default: "Your feature commit message must start with a ticket number EG #123: Message or # Message"
+    default: "Your feature commit message must start with a ticket number EG #123: Message or #123 Message"
 
-  enforce-feature-branch-name:
+
+  enforce-stable-commit-message:
     description: If the stable commit message should be enforced.
     required: false
     type: boolean
     default: true
-  feature-branch-name-regex: 
-    description: "Required prefix on feature branch name."
+  stable-commit-regex:
+    description: "Required message prefix on stable branch."
     required: false
     type: string
-    default: "^feature-[#][0-9]+"
-  feature-branch-name-regex-failure-message: 
-    description: "Message for when required message prefix on a feature branch name fails. Should explain how to pass."
+    default:  "^[Merge pull request]"
+  stable-commit-regex-failure-message:
+    description: "Message for when required message prefix on a stable branch commit message fails. Should explain how to pass."
     required: false
     type: string
-    default: "Your branch name must start with an issue number EG #123 or #123-ShinyFeature"
+    default:  "Your commit message to a stable branch requires the prefix. [Merge pull request...]. You should be doing a PR."
 
   enforce-release-commit-message:
     description: If the stable commit message should be enforced.
@@ -126,13 +127,13 @@ inputs:
 runs:
   using: 'composite'
   steps:      
-    - name: Inject slug/short variables
-      uses: rlespinasse/github-slug-action@v4
-    - name: Get branch.
-      id: get-branch
-      shell: bash
-      run: |
-          echo "branch=${GITHUB_REF_SLUG}" >> $GITHUB_OUTPUT
+    # - name: Inject slug/short variables
+    #   uses: rlespinasse/github-slug-action@v4
+    # - name: Get branch.
+    #   id: get-branch
+    #   shell: bash
+    #   run: |
+    #       echo "branch=${GITHUB_REF_SLUG}" >> $GITHUB_OUTPUT
     - name: Logging
       if: inputs.show-logging
       shell: bash
@@ -160,14 +161,15 @@ runs:
         echo "Enforce Hotfix Branch Name Message: ${{inputs.enforce-hotfix-branch-name}}"
         echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
         echo ""
-        echo "Branch Name: ${{steps.get-branch.outputs.branch}}"
+        echo "Branch Name: ${{github.event.ref}}"
+        echo "Branch Name: ${{github.event.ref}}"
         echo "Commit Message: ${{github.event.head_commit.message}}"
         echo ""
     - name: Feature Branch Name Check
-      if: inputs.enforce-feature-branch-name && !startsWith(steps.get-branch.outputs.branch, 'release-') && !startsWith(steps.get-branch.outputs.branch, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
+      if: inputs.enforce-feature-branch-name && !startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
       shell: bash
       run: |          
-        if [[ ! ${{steps.get-branch.outputs.branch}} =~ ${{inputs.feature-branch-name-regex}} ]]
+        if [[ ! ${{github.event.ref}} =~ ${{inputs.feature-branch-name-regex}} ]]
         then
           echo "${{inputs.feature-branch-name-regex-failure-message}}"
           echo "::error::${{inputs.feature-branch-name-regex-failure-message}}"
@@ -176,7 +178,7 @@ runs:
           echo "Feature branch name ok."
         fi
     - name: Feature Commit Message Check
-      if: inputs.enforce-feature-commit-message && false == startsWith(steps.get-branch.outputs.branch, 'release-') && !startsWith(steps.get-branch.outputs.branch, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
+      if: inputs.enforce-feature-commit-message && false == startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
@@ -186,7 +188,7 @@ runs:
           exit 1
         fi
     - name: Stable Commit Message Check
-      if: inputs.inputs.enforce-stable-commit-message && contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
+      if: inputs.inputs.enforce-stable-commit-message && contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]

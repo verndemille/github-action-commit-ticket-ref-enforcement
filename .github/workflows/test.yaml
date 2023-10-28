@@ -16,3 +16,5 @@ jobs:
         id: self-test
         with:
           show-logging: true
+          enforce-feature-branch-name: true
+          enforce-feature-commit-message: false
