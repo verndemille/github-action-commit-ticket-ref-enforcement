@@ -21,7 +21,7 @@ inputs:
     description: "Required prefix on feature branch name."
     required: false
     type: string
-    default: "^feature-[#]*[0-9]+"
+    default: "^refs/heads/feature/[#][0-9]+"
   feature-branch-name-regex-failure-message: 
     description: "Message for when required message prefix on a feature branch name fails. Should explain how to pass."
     required: false
