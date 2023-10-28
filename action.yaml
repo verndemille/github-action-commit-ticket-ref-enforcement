@@ -164,7 +164,7 @@ runs:
         echo "Commit Message: ${{github.event.head_commit.message}}"
         echo ""
     - name: Feature Branch Name Check
-      if: enforce-feature-commit-message && !startsWith(steps.get-branch.outputs.branch, 'release-') && !startsWith(steps.get-branch.outputs.branch, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
+      if: inputs.enforce-feature-branch-name && !startsWith(steps.get-branch.outputs.branch, 'release-') && !startsWith(steps.get-branch.outputs.branch, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
       shell: bash
       run: |          
         if [[ ! ${{steps.get-branch.outputs.branch}} =~ ${{inputs.feature-branch-name-regex}} ]]
@@ -176,7 +176,7 @@ runs:
           echo "Feature branch name ok."
         fi
     - name: Feature Commit Message Check
-      if: enforce-feature-commit-message && false == startsWith(steps.get-branch.outputs.branch, 'release-') && !startsWith(steps.get-branch.outputs.branch, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
+      if: inputs.enforce-feature-commit-message && false == startsWith(steps.get-branch.outputs.branch, 'release-') && !startsWith(steps.get-branch.outputs.branch, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
@@ -186,7 +186,7 @@ runs:
           exit 1
         fi
     - name: Stable Commit Message Check
-      if: enforce-feature-commit-message && contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
+      if: inputs.inputs.enforce-stable-commit-message && contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
