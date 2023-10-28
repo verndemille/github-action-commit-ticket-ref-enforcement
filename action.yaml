@@ -161,10 +161,6 @@ runs:
         echo ""
         echo "Branch Name: ${{github.ref.name}}"
         echo "Commit Message: ${{github.event.head_commit.message}}"
-        echo "Event Ref: ${{github.event.ref}}"
-        echo "Base Ref: ${{github.base_ref}}"
-        echo "Head Ref: ${{github.head_ref}}"
-        echo "Context: ${{github}}"
         echo ""
     - name: Feature Branch Name Check
       if: false == startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
