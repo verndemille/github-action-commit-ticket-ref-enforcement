@@ -126,6 +126,12 @@ inputs:
 runs:
   using: 'composite'
   steps:      
+    - name: Inject slug/short variables
+      uses: rlespinasse/github-slug-action@v4
+    - name: Prepare Outputs
+        id: prepare-step
+        run: |
+          echo "branch=${GITHUB_REF_SLUG}" >> $GITHUB_OUTPUT
     - name: Logging
       if: inputs.show-logging
       shell: bash
@@ -155,9 +161,14 @@ runs:
         echo ""
         echo "Branch Name: ${{github.ref.name}}"
         echo "Commit Message: ${{github.event.head_commit.message}}"
+        echo "Event Ref: ${{github.event.ref}}"
+        echo "Base Ref: ${{github.base_ref}}"
+        echo "Head Ref: ${{github.head_ref}}"
+        echo "Context: ${{github}}"
+        
         echo ""
     - name: Feature Branch Name Check
-      if: startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
+      if: false == startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
       shell: bash
       run: |          
         if [[ ! ${{github.ref.name}} =~ ${{inputs.feature-branch-name-regex}} ]]
@@ -167,7 +178,7 @@ runs:
           echo "Nope Feature Branch Name Check"
         fi
     - name: Feature Commit Message Check
-      if: startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
+      if: false == startsWith(github.ref.name, 'release-') && !startsWith(github.ref.name, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.ref.name)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
