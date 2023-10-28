@@ -17,4 +17,4 @@ jobs:
         with:
           show-logging: true
           enforce-feature-branch-name: false
-          enforce-feature-commit-message: false
+          enforce-feature-commit-message: true
