@@ -135,7 +135,7 @@ runs:
     #   run: |
     #       echo "branch=${GITHUB_REF_SLUG}" >> $GITHUB_OUTPUT
     - name: Logging
-      if: inputs.show-logging == true
+      if: inputs.show-logging = true
       shell: bash
       run: |
         echo "Showing configuration setup (To disable set show-logging false.)"
@@ -166,7 +166,7 @@ runs:
         echo "Commit Message: ${{ github.event.head_commit.message }}"
         echo ""
     - name: Feature Branch Name Check
-      if: inputs.enforce-feature-branch-name == true && !startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
+      if: inputs.enforce-feature-branch-name = true && !startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
       shell: bash
       run: |          
         if [[ ! ${{github.event.ref}} =~ ${{inputs.feature-branch-name-regex}} ]]
@@ -178,7 +178,7 @@ runs:
           echo "Feature branch name ok."
         fi
     - name: Feature Commit Message Check
-      if: inputs.enforce-feature-commit-message == true && !startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
+      if: inputs.enforce-feature-commit-message = true && !startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
@@ -188,7 +188,7 @@ runs:
           exit 1
         fi
     - name: Stable Commit Message Check
-      if: inputs.enforce-stable-commit-message == true && contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
+      if: inputs.enforce-stable-commit-message = true && contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
