@@ -160,7 +160,7 @@ runs:
         echo "Enforce Hotfix Branch Name Message: ${{inputs.enforce-hotfix-branch-name}}"
         echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
         echo ""
-        echo "Branch Name: ${{steps.get-branch.branch}}"
+        echo "Branch Name: ${{steps.get-branch.outputs.branch}}"
         echo "Branch Name: $GITHUB_OUTPUT"
         echo "Commit Message: ${{github.event.head_commit.message}}"
         echo ""
