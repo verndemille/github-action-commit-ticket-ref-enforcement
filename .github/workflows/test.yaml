@@ -15,6 +15,6 @@ jobs:
         uses: ./.
         id: self-test
         with:
-          show-logging: false
+          show-logging: true
           enforce-feature-branch-name: true
           enforce-feature-commit-message: false
