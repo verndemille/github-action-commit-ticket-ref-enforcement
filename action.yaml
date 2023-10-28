@@ -135,38 +135,38 @@ runs:
     #   run: |
     #       echo "branch=${GITHUB_REF_SLUG}" >> $GITHUB_OUTPUT
     - name: Logging
-      if: inputs.show-logging
+      if: inputs.show-logging == 'true'
       shell: bash
       run: |
         echo "Showing configuration setup (To disable set show-logging false.)"
+        echo "Show Logging: ${{ inputs.show-logging }}"
+        echo ""
+        echo "Enforce Feature Branch Name Message: ${{ inputs.enforce-feature-branch-name }}"
+        echo "Feature Branch Name Regex: ${{ inputs.feature-branch-name-regex }}"
+        echo ""
+        echo "Enforce Feature Commit Message: ${{ inputs.enforce-feature-commit-message }}"
+        echo "Feature Commit Regex: ${{inputs.feature-commit-regex}}"
         echo ""
         echo "Enforce Stable Commit Message: ${{ inputs.enforce-stable-commit-message }}"
-        echo "Feature Commit Regex: ${{inputs.feature-commit-regex}}"
+        echo "Feature Commit Regex: ${{ inputs.feature-commit-regex}}"
         echo ""
-        echo "Enforce Feature Commit Message: ${{inputs.enforce-feature-commit-message}}"
-        echo "Feature Commit Regex: ${{inputs.feature-commit-regex}}"
+        echo "Enforce Release Commit Message: ${{ inputs.enforce-release-commit-message }}"
+        echo "Release Commit Regex: ${{ inputs.release-commit-regex}}"
         echo ""
-        echo "Enforce Feature Branch Name Message: ${{inputs.enforce-feature-branch-name}}"
-        echo "Feature Branch Name Regex: ${{inputs.feature-branch-name-regex}}"
+        echo "Enforce Release Branch Name Message: ${{ inputs.enforce-release-branch-name }}"
+        echo "Release Branch Name Regex: ${{ inputs.release-branch-name-regex }}"
         echo ""
-        echo "Enforce Release Commit Message: ${{inputs.enforce-release-commit-message}}"
-        echo "Release Commit Regex: ${{inputs.release-commit-regex}}"
+        echo "Enforce Hotfix Commit Message: ${{ inputs.enforce-hotfix-commit-message }}"
+        echo "Hotfix Commit Regex: ${{ inputs.hotfix-commit-regex }}"
         echo ""
-        echo "Enforce Release Branch Name Message: ${{inputs.enforce-release-branch-name}}"
-        echo "Release Branch Name Regex: ${{inputs.release-branch-name-regex}}"
+        echo "Enforce Hotfix Branch Name Message: ${{ inputs.enforce-hotfix-branch-name }}"
+        echo "Hotfix Branch Name Regex: ${{ inputs.hotfix-branch-name-regex }}"
         echo ""
-        echo "Enforce Hotfix Commit Message: ${{inputs.enforce-hotfix-commit-message}}"
-        echo "Hotfix Commit Regex: ${{inputs.hotfix-commit-regex}}"
-        echo ""
-        echo "Enforce Hotfix Branch Name Message: ${{inputs.enforce-hotfix-branch-name}}"
-        echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
-        echo ""
-        echo "Branch Name: ${{github.event.ref}}"
-        echo "Branch Name: ${{github.event.ref}}"
-        echo "Commit Message: ${{github.event.head_commit.message}}"
+        echo "Branch Name: ${{ github.event.ref }}"
+        echo "Commit Message: ${{ github.event.head_commit.message }}"
         echo ""
     - name: Feature Branch Name Check
-      if: inputs.enforce-feature-branch-name && !startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
+      if: inputs.enforce-feature-branch-name == 'true' && !startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
       shell: bash
       run: |          
         if [[ ! ${{github.event.ref}} =~ ${{inputs.feature-branch-name-regex}} ]]
@@ -178,7 +178,7 @@ runs:
           echo "Feature branch name ok."
         fi
     - name: Feature Commit Message Check
-      if: inputs.enforce-feature-commit-message && false == startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
+      if: inputs.enforce-feature-commit-message == 'true' && !startsWith(github.event.ref, 'release-') && !startsWith(github.event.ref, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
@@ -188,13 +188,13 @@ runs:
           exit 1
         fi
     - name: Stable Commit Message Check
-      if: inputs.inputs.enforce-stable-commit-message && contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
+      if: inputs.enforce-stable-commit-message == 'true' && contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
         then
           echo "${{inputs.feature-branch-name-regex-failure-message}}"
-          echo "::error::${{inputs.feature-branch-name-regex-failure-message}}"
+          echo "::error::${{inputs.stable-commit-message-regex-failure-message}}"
           exit 1
         else
           echo "Nope Stable Commit Message Check"
