@@ -169,27 +169,36 @@ runs:
       run: |          
         if [[ ! ${{steps.get-branch.outputs.branch}} =~ ${{inputs.feature-branch-name-regex}} ]]
         then
-          echo "Yep Feature Branch Name Check"
+          MESSAGE="Your branch name must start with a ticket number EG OP-123 or OP-123-ShinyFeature"
+          echo "$MESSAGE"
+          echo "::error::$MESSAGE"
+          exit 1
         else
-          echo "Nope Feature Branch Name Check"
+          echo "Feature branch name ok."
         fi
     - name: Feature Commit Message Check
       if: false == startsWith(steps.get-branch.outputs.branch, 'release-') && !startsWith(steps.get-branch.outputs.branch, 'hotfix-') && !contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.feature-commit-regex}} ]]
-                then
-          echo "Yep Feature Commit Message Check"
+        then
+          MESSAGE="Your commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
+          echo "$MESSAGE"
+          echo "::error::$MESSAGE"
+          exit 1
         else
-          echo "Nope Feature Commit Message Check"
+          echo "Feature commit message ok."
         fi
     - name: Stable Commit Message Check
       if: contains(fromJSON(inputs.stable-branches-csv),steps.get-branch.outputs.branch)
       shell: bash
       run: |          
         if [[ ! "${{github.event.head_commit.message}}" =~ ${{inputs.stable-commit-regex}} ]]
-                then
-          echo "Yep Stable Commit Message Check"
+        then
+          MESSAGE="Your commit message must start with a ticket number EG OP-123: Message or OP-123 Message"
+          echo "$MESSAGE"
+          echo "::error::$MESSAGE"
+          exit 1
         else
           echo "Nope Stable Commit Message Check"
         fi
