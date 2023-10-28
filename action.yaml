@@ -12,21 +12,21 @@ inputs:
     type: string
     default: '["main","master","dev","develop","development","qa","staging","stage"]'
 
-  enforce-stable-commit-message:
+  enforce-feature-branch-name:
     description: If the stable commit message should be enforced.
     required: false
     type: boolean
     default: true
-  stable-commit-regex:
-    description: "Required message prefix on stable branch."
+  feature-branch-name-regex: 
+    description: "Required prefix on feature branch name."
     required: false
     type: string
-    default:  "^[Merge pull request]"
-  stable-commit-regex-failure-message:
-    description: "Message for when required message prefix on a stable branch commit message fails. Should explain how to pass."
+    default: "^feature-[#]*[0-9]+"
+  feature-branch-name-regex-failure-message: 
+    description: "Message for when required message prefix on a feature branch name fails. Should explain how to pass."
     required: false
     type: string
-    default:  "Your commit message to a stable branch requires the prefix. [Merge pull request...]. You should be doing a PR."
+    default: "Your branch name must start with an issue number EG #123 or #123-ShinyFeature"
 
   enforce-feature-commit-message:
     description: If the stable commit message should be enforced.
@@ -44,21 +44,22 @@ inputs:
     type: string
     default: "Your feature commit message must start with a ticket number EG #123: Message or # Message"
 
-  enforce-feature-branch-name:
+
+  enforce-stable-commit-message:
     description: If the stable commit message should be enforced.
     required: false
     type: boolean
     default: true
-  feature-branch-name-regex: 
-    description: "Required prefix on feature branch name."
+  stable-commit-regex:
+    description: "Required message prefix on stable branch."
     required: false
     type: string
-    default: "^feature-[#][0-9]+"
-  feature-branch-name-regex-failure-message: 
-    description: "Message for when required message prefix on a feature branch name fails. Should explain how to pass."
+    default:  "^[Merge pull request]"
+  stable-commit-regex-failure-message:
+    description: "Message for when required message prefix on a stable branch commit message fails. Should explain how to pass."
     required: false
     type: string
-    default: "Your branch name must start with an issue number EG #123 or #123-ShinyFeature"
+    default:  "Your commit message to a stable branch requires the prefix. [Merge pull request...]. You should be doing a PR."
 
   enforce-release-commit-message:
     description: If the stable commit message should be enforced.
@@ -161,6 +162,7 @@ runs:
         echo "Hotfix Branch Name Regex: ${{inputs.hotfix-branch-name-regex}}"
         echo ""
         echo "Branch Name: ${{steps.get-branch.outputs.branch}}"
+        echo "Branch Name: ${{github.event.ref}}"
         echo "Commit Message: ${{github.event.head_commit.message}}"
         echo ""
     - name: Feature Branch Name Check
