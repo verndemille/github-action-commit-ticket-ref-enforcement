@@ -187,6 +187,8 @@ runs:
           echo "${{inputs.feature-commit-regex-failure-message}}"
           echo "::error::${{inputs.feature-commit-regex-failure-message}}"
           exit 1
+        else
+          echo "Feature commit message ok."
         fi
     - name: Stable Commit Message Check
       if: inputs.enforce-stable-commit-message == 'true' && contains(fromJSON(inputs.stable-branches-csv),github.event.ref)
